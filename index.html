@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>MathBirthday!!!</title>
+	<link rel="stylesheet" href="css/main.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+	<div class="container" id="app">
+		<div class="jumbotron">
+			<h1>Welcome to <strong class="mb">Math Birthday!</strong></h1>
+			<p>Select your birth date and discover your Math Birthday*!!!</p>
+
+			<div class="row" id="form">
+				<div class="col-xs-12 col-sm-3">
+					<select tabindex="1" id="dobday" class="form-control input-lg"></select>
+				</div>
+				<div class="col-xs-12 col-sm-3">
+					<select tabindex="2" id="dobmonth" class="form-control input-lg"></select>
+				</div>
+				<div class="col-xs-12 col-sm-3">
+					<select tabindex="3" id="dobyear" class="form-control input-lg"></select>
+				</div>
+				<div class="col-xs-12 col-sm-3">
+					<a id="checkit" tabindex="4" class="btn btn-primary btn-lg" role="button">Check it out!</a>
+				</div>
+			</div>
+			
+
+			<div id="message"></div>
+
+			<p>
+				<small>* A "Math Birthday" is a date that is 10<sup>n</sup> days after the day you were born.</small>
+			</p>
+		</div>
+	</div>
+	<script src="bower_components/jquery/dist/jquery.min.js"></script>
+	<script src="bower_components/moment/min/moment.min.js"></script>
+	<script src="assets/dobPicker.min.js"></script>
+	<script src="assets/jsrender.min.js"></script>
+	<script id="mathbirthday" type="text/x-jsrender">
+		<div class="alert alert-success" role="alert">
+			<p><strong>Happy Math Birthday!!!!</strong> Today is your <strong>{{>todayDaysAge}}-day-old</strong> birthday!</p>
+			<p>Your next math birthday is your <em>{{>nextDaysAge}}-day-old</em> birthday on <em>{{>nextBirthday}}</em>!</p>
+		</div>
+	</script>
+	<script id="futureMathbirthday" type="text/x-jsrender">
+		<div class="alert alert-info" role="alert">
+			<p>Your next math birthday is your <strong>{{>nextDaysAge}}-day-old birthday</strong> on <strong>{{>nextBirthday}}</strong>!</p>
+		</div>
+	</script>
+	<script id="notYet" type="text/x-jsrender">
+		<div class="alert alert-danger" role="alert">
+			<p>Well... How can I say... You need {{>daysLeft}} days to born!</p>
+		</div>
+	</script>
+	<script>
+
+		/**
+		 * @class
+		 * @requires bower_components/moment/min/moment.min.js
+		 */
+		var MathBirthday = function(base, format) {
+			// parameters
+
+			/**
+			 * @type {number}
+			 */
+			this.base = base || 10;
+
+			/**
+			 * @type {string} Moment date format string (@see {@link http://momentjs.com})
+			 */
+			this.format = format || 'LL';
+
+			// state
+
+			/**
+			 * @type {MathBirthdayState=}
+			 */
+			this.state = null;
+		}
+
+		/**
+		 * @param {Moment} currentDate
+		 * @param {Moment} birthDate
+		 * @returns {MathBirthdayState} 
+		 */
+		MathBirthday.prototype.calc = function(currentDate, birthDate){
+			var state = new MathBirthdayState;
+
+			state.todayDaysAge = currentDate.diff(birthDate, 'days');
+
+			while (state.nextDaysAge < state.todayDaysAge) {
+				state.nextDaysAge = state.nextDaysAge * this.base;
+			}
+
+			if (state.nextDaysAge === state.todayDaysAge) {
+				state.isToday = true;
+				state.nextDaysAge = state.nextDaysAge * this.base;
+			} else {
+				state.isToday = false;
+			}
+
+			state.nextBirthday = birthDate.add(state.nextDaysAge, 'days').format(this.format);
+
+			return state;
+		};
+
+		/**
+		 * @class
+		 */
+		var MathBirthdayState = function(){
+
+			/**
+			 * @type {number}
+			 */
+			this.nextDaysAge = 10;
+
+			/**
+			 * @type {Moment}
+			 */
+			this.nextBirthday = null;
+
+			/**
+			 * @type {number}
+			 */
+			this.todayDaysAge = 0;
+
+			/**
+			 * @type {boolean}
+			 */
+			this.isToday = false;
+		}
+
+		function calcMathBirthday(event) {
+			console.log(event);
+			if (event.type === "keyup" && event.keyCode !== 13) return;
+
+			var mb = new MathBirthday();
+			var date = {
+				day: $("#dobday").val(),
+				month: $("#dobmonth").val(),
+				year: $("#dobyear").val(),
+
+			};
+			var dateArray = [
+				date.day, date.month, date.year
+			];
+			var birthDate = moment(dateArray.join("-"), "DD-MM-YYYY");
+			var now = moment();
+			var state = mb.calc(now, birthDate);
+
+			$(".alert").hide();
+
+			var tmpl = "#mathbirthday";
+			if (state.isToday)
+				tmpl = "#mathbirthday";
+			else if (state.todayDaysAge > 0)
+				tmpl = "#futureMathbirthday";
+			else 
+				tmpl = "#notYet";
+
+			$("#message").html($(tmpl).render(state));
+			$(".alert").fadeIn();
+		}
+
+		$(document).ready(function(){
+			$.dobPicker({
+				daySelector: '#dobday',
+				monthSelector: '#dobmonth',
+				yearSelector: '#dobyear',
+				dayDefault: 'Day',
+				monthDefault: 'Month',
+				yearDefault: 'Year',
+				minimumAge: 0,
+				maximumAge: 120
+			});
+
+			$("#checkit").on("click keyup", calcMathBirthday);
+		});
+	</script>
+</body>
+</html>

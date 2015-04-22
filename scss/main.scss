@@ -1,0 +1,42 @@
+@import "../bower_components/bootstrap-sass/assets/stylesheets/bootstrap";
+
+#app { 
+	// Colors
+	strong.mb {
+		color: $brand-primary;
+	}
+	p {
+		color: $gray;
+	}
+	small {
+		color: $gray-light;
+	}
+
+	// Sizes
+	.alert {
+		font-size: $font-size-large;
+		display: none;
+	}
+
+	// Spaces
+	.jumbotron {
+		@media (max-width: $screen-xs-max) {
+			border-radius: 0px;
+			margin-top: 0px;
+		}
+		margin-top: $navbar-height;
+	}
+	.btn-lg {
+		@media (max-width: $screen-xs-max) {
+			display: block !important;
+		}	
+	}
+	.col-xs-12 {
+		padding-bottom: $padding-large-vertical;
+	}
+	.messages {
+		min-height: 210px;
+	}
+}
+
+
