@@ -4,6 +4,10 @@
 	<title>MathBirthday!!!</title>
 	<link rel="stylesheet" href="css/main.css">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- TEST PROPOUSE -->
+	<link rel="shortcut icon" type="image/png" href="jasmine/images/jasmine_favicon.png">
+	<link rel="stylesheet" type="text/css" href="jasmine/lib/jasmine-core/jasmine.css">
+	<!-- TEST PROPOUSE -->
 </head>
 <body>
 	<div class="container" id="app">
@@ -38,6 +42,11 @@
 	<script src="bower_components/moment/min/moment.min.js"></script>
 	<script src="assets/dobPicker.min.js"></script>
 	<script src="assets/jsrender.min.js"></script>
+	<!-- TEST PROPOUSE -->
+	<script type="text/javascript" src="jasmine/lib/jasmine-core/jasmine.js"></script>
+	<script type="text/javascript" src="jasmine/lib/jasmine-core/jasmine-html.js"></script>
+	<script type="text/javascript" src="jasmine/lib/jasmine-core/boot.js"></script>
+	<!-- TEST PROPOUSE -->
 	<script id="mathbirthday" type="text/x-jsrender">
 		<div class="alert alert-success" role="alert">
 			<p><strong>Happy Math Birthday!!!!</strong> Today is your <strong>{{>todayDaysAge}}-day-old</strong> birthday!</p>
@@ -158,8 +167,11 @@
 				tmpl = "#mathbirthday";
 			else if (state.todayDaysAge > 0)
 				tmpl = "#futureMathbirthday";
-			else 
+			else {
+				state = {daysLeft: Math.abs(state.todayDaysAge)};
 				tmpl = "#notYet";
+			}
+				
 
 			$("#message").html($(tmpl).render(state));
 			$(".alert").fadeIn();
@@ -180,5 +192,6 @@
 			$("#checkit").on("click keyup", calcMathBirthday);
 		});
 	</script>
+	<script src="lib/mathbirtdaySpec.js"></script>
 </body>
 </html>
